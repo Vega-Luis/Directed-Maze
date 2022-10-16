@@ -11,9 +11,6 @@
 % @param DestineRow Row index of the destine vertex.
 % @param DestineColumn Column index of the destine vertex.
 
-% Up-direcion 
-
-
 % Posible moves on left-direction vertex.
 edge(OriginRow, OriginColumn, OriginRow, DestineColumn, at):-
     DestineColumn is OriginColumn - 1,
@@ -34,6 +31,15 @@ edge(OriginRow, OriginColumn, DestineRow, OriginColumn, ab):-
     DestineRow is OriginRow + 1,
     not(isWall(DestineRow, OriginColumn)),!.
 
+edge(OriginRow, OriginColumn, DestineRow, DestineColumn, i):-
+    edge(OriginRow, OriginColumn, DestineRow,DestineColumn, ar).
+
+edge(OriginRow, OriginColumn, DestineRow, DestineColumn, i):-
+    edge(OriginRow, OriginColumn, DestineRow,DestineColumn, ab).
+
+edge(OriginRow, OriginColumn, DestineRow, DestineColumn, i):-
+    edge(OriginRow, OriginColumn, DestineRow,DestineColumn, ad).
+
 edge(OriginRow, OriginColumn, DestineRow, DestineColumn, inter):-
     edge(OriginRow, OriginColumn, DestineRow,DestineColumn, at).
 
@@ -49,15 +55,23 @@ edge(OriginRow, OriginColumn, DestineRow, DestineColumn, inter):-
 % Checks if there is track between origin and destination x = wall
 isWall(Row, Column):-getVertexValue(Row,Column,Value), Value = x.
 
-% Calcualte the maze start row.
-getStart([[Point|_]|_], 0):- Point = i.
-getStart([[_|_]|Tail], Row):-
-    getStart(Tail, RowDown),
+
+% Finds the maze origin coordinate.
+originPoint([[Point|_]|_], 0, 0):- Point = i.
+originPoint([_|Tail], Row, Column):-
+    originPoint(Tail, RowDown, Column),
     Row is RowDown + 1.
 
-% Returns the maze start point.
-startPoint(Row, 0):-
-    maze(M), getStart(M, Row),!.
+% Finds the maze desitne coordinate.
+destinePoint([Row|_], 0, Column):-
+    length(Row, Length),
+    nth1(Length, Row, Element),
+    Element = f,
+    Column is Length - 1,!.
+destinePoint([_|Tail], Row, Column):-
+    destinePoint(Tail, RowDown, Column),
+    Row is RowDown + 1.
+
 
 % Obtains the value of the (i,j) position in the game matrix.
 getVertexValue(RowIndex, ColumnIndex, Value):-
@@ -79,3 +93,20 @@ notVisited(Target, List):-
 visited(Value, [Value|_]):-!.
 visited(Value, [_|Tail]):-
     visited(Value, Tail).
+
+% Finds and returns a list with the coordinates of the solution path.
+findSolution([[OriginRow, OriginColumn]| Path]):-
+    maze(Maze),
+    originPoint(Maze, OriginRow, OriginColumn),
+    destinePoint(Maze, DestineRow, DestineColumn),
+    findPath(OriginRow, OriginColumn, DestineRow, DestineColumn, [], Path).
+
+suggestion(ActualRow, ActualColumn, Suggestion):-
+    maze(Maze),
+    destinePoint(Maze, DestineRow, DestineColumn),
+    findPath(ActualRow, ActualColumn, DestineRow, DestineColumn, [], [Suggestion|_]).
+
+verify(ActualRow, ActualColumn):-
+    maze(Maze),
+    destinePoint(Maze, DestineRow, DestineColumn),
+    findPath(ActualRow, ActualColumn, DestineRow, DestineColumn, [], _),!.

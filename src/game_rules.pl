@@ -1,4 +1,6 @@
-%%
+% Load maze
+:- ensure_loaded("load_maze.pl").
+
 %
 % The edge/5 predicate works as an graph edge.
 % When called with OriginRow and OriginColumn returns in DestineRow and DestineColumn

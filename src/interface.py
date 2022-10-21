@@ -1,20 +1,18 @@
-from pyswip import *
+import controllerProlog
+import pygame
 
-prolog = Prolog()
-prolog.consult('game_rules.pl')
+class interface:
+    def __init__(self):
+        pass
 
-def LoadMaze():        
-    loadMaze = Functor('loadMaze',1)
-    call(loadMaze("C:/Users/admin/Documents/Tec/II Semestre 2022/Leguanjes de programacion/Proyectos/Proyecto 3/Programa/Directed-Maze/data/maze000.txt"))
+
+
+
+
+class player:
+    def __init__(self,nickNmae):
+        self.name = nickNmae
+        self.movements = 0
+        self.suggestions = 10
+        self.type = ""
     
-
-def getMaze():        
-    maze = Functor('maze',1)
-    Matriz  = Variable()
-    q = Query(maze(Matriz))
-    while q.nextSolution():
-        print(Matriz.value)
-    q.closeQuery()
-
-LoadMaze()
-getMaze()

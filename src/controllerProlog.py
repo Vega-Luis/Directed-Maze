@@ -1,3 +1,4 @@
+from sys import flags
 from pyswip import *
 
 class controllerProlog:
@@ -46,18 +47,56 @@ class controllerProlog:
             maze+=[array]
         self.maze = maze
 
+    """
+     * This function reboot maze game 
+    """
     def reboot(self):
         pass
 
-    def check(self):
-        pass
+    """
+     * This function returns true or false if the current position is part of the path solution
+     * @param {Integer} ActualRow: current position row 
+     * @param {Integer} ActualColumn: current position column 
+     * @returns {Boolean}: Return True or False 
+    """
+    def check(self,ActualRow, ActualColumn):
+        verify = Functor('verify',2)
+        q = Query(verify(ActualRow, ActualColumn))
+        flag = False
+        while q.nextSolution():
+            flag = True
+        q.closeQuery()
+        return flag
     
-    def suggestion(self):
-        pass
+    """
+     * This function gives position suggestions to find a route solution
+     * @param {Integer} ActualRow: current position row 
+     * @param {Integer} ActualColumn: current position column 
+     * @returns {Array}: Return array with position suggestions
+    """
+    def suggestion(self,ActualRow, ActualColumn):
+        suggestion = Functor('suggestion',3)
+        Suggestion  = Variable()
+        q = Query(suggestion(ActualRow, ActualColumn,Suggestion))
+        array = []
+        while q.nextSolution():
+            array += [Suggestion.value]
+        q.closeQuery()
+        return array
 
+    """
+     * This function returns the solution to the maze
+     * @returns {Array}: Return array with solution path
+    """
     def seeSolution(self):
-        pass
-    
+        findSolution = Functor('findSolution',1)
+        Maze  = Variable()
+        q = Query(findSolution(Maze))
+        while q.nextSolution():
+            matrix = Maze.value
+        q.closeQuery()
+        return matrix
+
 c = controllerProlog('C:/Users/admin/Documents/Tec/II Semestre 2022/Leguanjes de programacion/Proyectos/Proyecto 3/Programa/Directed-Maze/data/maze000.txt')
 c.getMaze()
-print(c.maze)
+c.seeSolution()

@@ -1,4 +1,5 @@
 import sys
+from pygame import *
 import pygame
 from pygame.locals import *
 
@@ -8,7 +9,7 @@ class Player:
         self.movements = 0
         self.suggestions = 10
         self.type = ""
-        self.rect = pygame.Rect(0, 80, 40,40)
+        self.rect = pygame.Rect(15, 95, 40,40)
         self.row = 0
         self.column = 0 
         self.previous=""
@@ -80,7 +81,13 @@ class Wall(object):
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 40, 40)
-        
+
+class Boton:
+    def __init__(self,screen):
+        self.screen = screen
+        self.rect = self.screen.get_rect()
+        self.width = self.height = 500, 500
+              
 walls = []
 maze = [['x','x','x','x','x','x','x','x','x','x','x'],
         ['x','ar','x','x','ad','ad','ad','inter','ad','inter','x'],
@@ -105,10 +112,15 @@ class App:
         
         self.player = Player()
         self.end_rect=""
+        self.button_reboot = Rect(520,50,90,30)
+        self.button_verify = Rect(520,100,80,30)
+        self.button_suggetion = Rect(500,150,120,30)
+        self.button_seeSolition = Rect(490,200,140,30)
         self.draw()
 
+
     def draw(self):
-        x = y = 0
+        x = y = 15
         for row in maze:
             for col in row:
                 if col == "x":
@@ -118,13 +130,15 @@ class App:
                 
                 x += 40
             y += 40
-            x = 0
+            x = 15
 
     def run(self):
+        myFort = font.SysFont("Calibri",25)
         while App.running:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     App.running = False
+                
                 elif event.type == pygame.KEYDOWN:
                     if (event.key == K_RIGHT):
                         self.player.move(40, 0)
@@ -134,17 +148,64 @@ class App:
                         self.player.move(0, -40)
                     elif (event.key == K_DOWN):
                         self.player.move(0, 40)
+                
+                elif (event.type == MOUSEBUTTONDOWN and event.button == 1):
+                    if (self.button_verify.collidepoint(mouse.get_pos())):
+                        print("Uno")
+                    elif (self.button_suggetion.collidepoint(mouse.get_pos())):
+                        print("Dos")
+                    elif (self.button_seeSolition.collidepoint(mouse.get_pos())):
+                        print("Tres")
+                    elif (self.button_reboot.collidepoint(mouse.get_pos())):
+                        print("Tres")
+
             if self.player.rect.colliderect(self.end_rect):
-                pygame.quit()
-                sys.exit()
+                    pygame.quit()
+                    sys.exit()
+
+            if (self.button_verify.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(237,128,19),self.button_verify,0)
+            else: # if not(self.button_verify.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(70,184,34),self.button_verify,0)
+
+            if (self.button_suggetion.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(237,128,19),self.button_suggetion,0)
+            else: #if not(self.button_suggetion.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(70,184,34),self.button_suggetion,0)
+            
+            if (self.button_seeSolition.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(237,128,19),self.button_seeSolition,0)
+            else: # if not(self.button_seeSolition.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(70,184,34),self.button_seeSolition,0)
+
+            if (self.button_reboot.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(237,128,19),self.button_reboot,0)
+            else: #if not(self.button_reboot.collidepoint(mouse.get_pos())):
+                draw.rect(self.screen,(70,184,34),self.button_reboot,0)
 
             App.screen.fill((0, 0, 50))
             for wall in walls:
                 pygame.draw.rect(App.screen , (255, 255, 255), wall.rect)
             pygame.draw.rect(App.screen , (255, 0, 0), self.end_rect)
             pygame.draw.rect(App.screen , (255, 200, 0),self.player.rect)
-            pygame.display.flip()
+            texto1 = myFort.render("Verify",True,(255,255,255))
+            texto2 = myFort.render("Suggetion",True,(255,255,255))
+            texto3 = myFort.render("See Solition",True,(255,255,255))
+            texto4 = myFort.render("Reniciar",True,(255,255,255))
 
+            self.screen.blit(texto1,(self.button_verify.x+(self.button_verify.width-texto1.get_width())/2,
+                        self.button_verify.y+(self.button_verify.height-texto1.get_height())/2))
+
+            self.screen.blit(texto2,(self.button_suggetion.x+(self.button_suggetion.width-texto2.get_width())/2,
+                        self.button_suggetion.y+(self.button_suggetion.height-texto2.get_height())/2))
+            
+            self.screen.blit(texto3,(self.button_seeSolition.x+(self.button_seeSolition.width-texto3.get_width())/2,
+                        self.button_seeSolition.y+(self.button_seeSolition.height-texto3.get_height())/2))
+
+            self.screen.blit(texto4,(self.button_reboot.x+(self.button_reboot.width-texto4.get_width())/2,
+                        self.button_reboot.y+(self.button_reboot.height-texto4.get_height())/2))
+            pygame.display.flip()
+            
         pygame.quit()
 
 

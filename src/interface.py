@@ -1,9 +1,9 @@
-from array import array
 import sys
 from pygame import *
 import pygame
 from pygame.locals import *
 from inputText import InputText 
+import time
 #import controllerProlog
 
 """
@@ -64,6 +64,7 @@ class Player:
             if (dy < 0):
                 self.previous="UP"
                 self.row-=1
+            self.movements+=1
             self.rect = pygame.Rect(self.rect.x+dx,self.rect.y+dy, 40,40)
         else:
             print("Cannot move")
@@ -119,7 +120,11 @@ class Player:
             array+= [[column,row]]
         return array
 
-        
+    """
+    * 
+    *
+    * @param {String} 
+    """
 """
     * 
     *
@@ -266,6 +271,7 @@ class App:
             x += 40
             y = 15
 
+
     """
     * 
     *
@@ -273,10 +279,10 @@ class App:
     """
     def reboot(self):
         self.player.rect = pygame.Rect(15, 95, 40,40)
-        self.player.type = "abandono"
+        self.player.type = "Abandono"
         self.player.row = 2
         self.player.column = 0
-
+    
     """
     * 
     *
@@ -298,11 +304,15 @@ class App:
     """
     def suggetion(self):
         #suggetions_list = self.controllerProlog.suggestion(self.player.row,self.player.column)
-        array = self.player.getValue([[2,2]])
-        for element in array:
-            rect = pygame.Rect(element[0],element[1],40,40)
-            self.suggetion_list.append(rect)
-    
+        if (self.player.suggestions>0):
+            array = self.player.getValue([[2,2]])
+            for element in array:
+                rect = pygame.Rect(element[0],element[1],40,40)
+                self.suggetion_list.append(rect)
+        else:
+            pass
+            #sonido o ventana
+        
     """
     * 
     *
@@ -314,6 +324,7 @@ class App:
         for element in array:
             rect = pygame.Rect(element[0],element[1],40,40)
             self.seeSolition_list.append(rect)
+        self.player.type="Autosolución" 
 
     """
     * 
@@ -321,7 +332,10 @@ class App:
     * @param {String} 
     """
     def statistics(self):
-        pass
+        print("Nickname: ",self.player.name)
+        print("Movements: ",self.player.movements)
+        print("Suggestions: ",self.player.suggestions)
+        print("Solution type: ",self.player.type)
     
 
     """
@@ -364,8 +378,8 @@ class App:
                         print("Tres")
 
             if self.player.rect.colliderect(self.end_rect):
-                    pygame.quit()
-                    sys.exit()
+                    self.player.type = "Exitosa" 
+                    self.statistics()
 
             App.screen.fill((0, 0, 50))
             
@@ -381,11 +395,7 @@ class App:
             else:
                 for way in ways:
                     App.screen.blit(way.img, way.rect)
-
-            if (flag_Suggetion):
-                for element in self.suggetion_list:
-                    pygame.draw.rect(App.screen , (0, 128, 0), element,4)
-
+                    
             pygame.draw.rect(App.screen , (255, 0, 0), self.end_rect)
             pygame.draw.rect(App.screen , (255, 200, 0),self.player.rect)
 
@@ -407,6 +417,13 @@ class App:
                         self.button_reboot.y+(self.button_reboot.height-texto4.get_height())/2))
             
             pygame.display.flip()
+
+            if (flag_Suggetion):
+                for element in self.suggetion_list:
+                    pygame.draw.rect(App.screen , (0, 128, 0), element,4)
+                pygame.display.update()
+                time.sleep(3)
+                flag_Suggetion = False
         pygame.quit()
 
 """

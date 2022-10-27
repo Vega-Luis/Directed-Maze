@@ -77,10 +77,85 @@ class Player:
                 return True
             return False
             
+    def reboot(self):
+        self.rect = pygame.Rect(15, 95, 40,40)
+        self.type = "abandono"
+        self.row = 2
+        self.column = 0
+
+    def verify(self):
+        pass
+
+    def suggetion(self):
+        pass
+    
+    def seeSolition(self):
+        pass
+
+    def statistics(self):
+        pass
+
 class Wall(object):
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 40, 40)
+
+class Way(object):
+    def __init__(self, pos,wayType):
+        self.img = pygame.image.load('resource/vacio.png')
+        self.rect = self.img.get_rect()
+        ways.append(self)
+        self.draw(pos,wayType)
+    
+    def draw(self,pos,wayType):
+        if (wayType == 'ad'):
+            self.img = pygame.image.load('resource/flecha-derecha.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
+
+        elif (wayType == 'ar'):
+
+            self.img = pygame.image.load('resource/flecha-arriba.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
+
+        elif (wayType == 'ab'):
+            self.img = pygame.image.load('resource/flecha-abajo.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
+
+        elif (wayType == 'inter'):
+            self.img = pygame.image.load('resource/cuatro-flechas.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
+        
+        elif (wayType == 'at'):
+            self.img = pygame.image.load('resource/flechas-circulares.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
+
+        else:
+            self.img = pygame.image.load('resource/flecha-de-juego.png')
+            self.img.convert()
+            self.rect = self.img.get_rect()
+            self.rect.center = pos[0]+20,pos[1]+20
+            self.rect.width = 40
+            self.rect.height = 40
 
 class Boton:
     def __init__(self,screen):
@@ -89,6 +164,7 @@ class Boton:
         self.width = self.height = 500, 500
               
 walls = []
+ways = []
 maze = [['x','x','x','x','x','x','x','x','x','x','x'],
         ['x','ar','x','x','ad','ad','ad','inter','ad','inter','x'],
         ['i','inter','ad','ad','inter','x','x','ab','x','ab','x'],
@@ -118,16 +194,16 @@ class App:
         self.button_seeSolition = Rect(490,200,140,30)
         self.draw()
 
-
     def draw(self):
         x = y = 15
         for row in maze:
             for col in row:
                 if col == "x":
                     Wall((x, y))
-                if col == "f":
+                elif col == "f":
                     self.end_rect = pygame.Rect(x, y, 40, 40)
-                
+                else:
+                    Way((x,y),col)
                 x += 40
             y += 40
             x = 15
@@ -150,42 +226,27 @@ class App:
                         self.player.move(0, 40)
                 
                 elif (event.type == MOUSEBUTTONDOWN and event.button == 1):
-                    if (self.button_verify.collidepoint(mouse.get_pos())):
-                        print("Uno")
+                    if (self.button_reboot.collidepoint(mouse.get_pos())):
+                        self.player.reboot()
                     elif (self.button_suggetion.collidepoint(mouse.get_pos())):
                         print("Dos")
                     elif (self.button_seeSolition.collidepoint(mouse.get_pos())):
                         print("Tres")
-                    elif (self.button_reboot.collidepoint(mouse.get_pos())):
+                    elif (self.button_verify.collidepoint(mouse.get_pos())):
                         print("Tres")
 
             if self.player.rect.colliderect(self.end_rect):
                     pygame.quit()
                     sys.exit()
 
-            if (self.button_verify.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(237,128,19),self.button_verify,0)
-            else: # if not(self.button_verify.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(70,184,34),self.button_verify,0)
-
-            if (self.button_suggetion.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(237,128,19),self.button_suggetion,0)
-            else: #if not(self.button_suggetion.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(70,184,34),self.button_suggetion,0)
-            
-            if (self.button_seeSolition.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(237,128,19),self.button_seeSolition,0)
-            else: # if not(self.button_seeSolition.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(70,184,34),self.button_seeSolition,0)
-
-            if (self.button_reboot.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(237,128,19),self.button_reboot,0)
-            else: #if not(self.button_reboot.collidepoint(mouse.get_pos())):
-                draw.rect(self.screen,(70,184,34),self.button_reboot,0)
-
             App.screen.fill((0, 0, 50))
+            
             for wall in walls:
                 pygame.draw.rect(App.screen , (255, 255, 255), wall.rect)
+            
+            for way in ways:
+                App.screen.blit(way.img, way.rect)
+
             pygame.draw.rect(App.screen , (255, 0, 0), self.end_rect)
             pygame.draw.rect(App.screen , (255, 200, 0),self.player.rect)
             texto1 = myFort.render("Verify",True,(255,255,255))
@@ -204,10 +265,9 @@ class App:
 
             self.screen.blit(texto4,(self.button_reboot.x+(self.button_reboot.width-texto4.get_width())/2,
                         self.button_reboot.y+(self.button_reboot.height-texto4.get_height())/2))
-            pygame.display.flip()
             
+            pygame.display.flip()
         pygame.quit()
-
 
 if __name__ == '__main__':
     App().run()

@@ -1,14 +1,16 @@
+from random import gammavariate
 from sys import flags
 from pyswip import *
+import constants as consts
 
-class controllerProlog:
+class PrologController:
     """
      * Class constructor
      * Set up a maze game by requesting the path of the maze file
      * @param {String} Path: The path of the maze file
     """
     prolog = Prolog()
-    prolog.consult('game_rules.pl')
+    prolog.consult(consts.GAME_RULES_PAHT)
 
     def __init__(self,Path):
         self.maze=[]
@@ -29,6 +31,7 @@ class controllerProlog:
         maze = Functor('maze',1)
         Matriz  = Variable()
         q = Query(maze(Matriz))
+        matrix = []
         while q.nextSolution():
             matrix = Matriz.value
         q.closeQuery()
@@ -92,11 +95,8 @@ class controllerProlog:
         findSolution = Functor('findSolution',1)
         Maze  = Variable()
         q = Query(findSolution(Maze))
+        matrix = []
         while q.nextSolution():
             matrix = Maze.value
         q.closeQuery()
         return matrix
-
-c = controllerProlog('C:/Users/admin/Documents/Tec/II Semestre 2022/Leguanjes de programacion/Proyectos/Proyecto 3/Programa/Directed-Maze/data/maze000.txt')
-c.getMaze()
-c.seeSolution()

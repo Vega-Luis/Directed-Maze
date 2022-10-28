@@ -5,7 +5,7 @@ from pygame.locals import *
 from inputText import InputText 
 import time
 import constants as consts
-#import controllerProlog
+import controllerProlog
 
 """
 * Class constructor
@@ -236,7 +236,7 @@ class App:
     *
     * @param {String} 
     """
-    def __init__(self,Path):
+    def __init__(self):
         pygame.init()
         flags = RESIZABLE
         App.screen = pygame.display.set_mode((650, 500), flags)
@@ -250,8 +250,7 @@ class App:
         self.suggetion_list= []
         self.seeSolition_list= []
         self.draw()
-        self.path = Path
-        #self.controllerProlog = ControllerProlog(self.path)
+        self.plController = ''
         #maze = self.controllerProlog.getMaze()
         
     def mainMenu(self):
@@ -296,6 +295,7 @@ class App:
                         if buttonPlay.collidepoint(mouse.get_pos()):
                             inputText = InputText()
                             inputText.run()
+                            self.plController = controllerProlog.PrologController(inputText.text)
                             self.run()
             pygame.display.flip()
 
@@ -350,12 +350,14 @@ class App:
     * @param {String} 
     """
     def suggetion(self):
-        #suggetions_list = self.controllerProlog.suggestion(self.player.row,self.player.column)
-        if (self.player.suggestions>0):
-            array = self.player.getValue([[2,2]])
+        self.suggetion_list = []
+        suggetions_list = self.plController.suggestion(self.player.row,self.player.column)
+        if (self.player.suggestions > 0):
+            array = self.player.getValue(suggetions_list)
             for element in array:
                 rect = pygame.Rect(element[0],element[1],40,40)
                 self.suggetion_list.append(rect)
+            self.player.suggestions -= 1
         else:
             pass
             #sonido o ventana
@@ -366,8 +368,8 @@ class App:
     * @param {String} 
     """
     def seeSolution(self):
-        #seeSolutions_list = self.controllerProlog.seeSolution()
-        array = self.player.getValue([[2,1],[2,2],[2,3]])
+        seeSolutions_list = self.plController.seeSolution()
+        array = self.player.getValue(seeSolutions_list)
         for element in array:
             rect = pygame.Rect(element[0],element[1],40,40)
             self.seeSolition_list.append(rect)
@@ -472,7 +474,7 @@ class App:
                 for element in self.suggetion_list:
                     pygame.draw.rect(App.screen , (0, 128, 0), element,4)
                 pygame.display.update()
-                time.sleep(2)
+                time.sleep(1)
                 flag_Suggetion = False
         pygame.display.update()
 
@@ -482,5 +484,5 @@ class App:
     * @param {String} 
     """
 if __name__ == '__main__':
-    App("data/maze000.txt").mainMenu()
+    App().mainMenu()
 

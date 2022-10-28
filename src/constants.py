@@ -1,0 +1,4 @@
+WINDOW_HEIGHT = 500
+WINDOW_WIDTH = 650
+GAME_RULES_PAHT = 'src/game_rules.pl'
+DEFAULT_MAZE_PAHT = 'data/maze000.txt'

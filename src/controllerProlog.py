@@ -15,6 +15,7 @@ class PrologController:
     def __init__(self,Path):
         self.maze=[]
         self.load_Maze(Path)
+        self.getMaze()
 
     """
      * This function calls prolog to read the file path and load the maze.
@@ -36,6 +37,22 @@ class PrologController:
             matrix = Matriz.value
         q.closeQuery()
         self.getMazeAux(matrix)
+
+    """
+     * Asks Prolog for the maze origin point.
+    """
+    def getOriginPoint(self):
+        getOriginPoint = Functor('getOriginPoint', 2)
+        OriginRow = Variable()
+        OriginColumn = Variable()
+        q = Query(getOriginPoint(OriginRow, OriginColumn))
+        row = 0
+        column = 0
+        while q.nextSolution():
+            row = OriginRow.value
+            column = OriginColumn.value
+        q.closeQuery()
+        return [row, column]
 
     """
      * This function converts the prolog array to a readable array

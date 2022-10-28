@@ -1,3 +1,4 @@
+from ssl import OPENSSL_VERSION_INFO
 import sys
 from pygame import *
 import pygame
@@ -24,62 +25,45 @@ class Player:
         self.movements = 0
         self.suggestions = 10
         self.type = ""
-        self.rect = pygame.Rect(15, 95, 40,40)
+        self.rect = ""
         self.row = 0
         self.column = 0 
         self.previous=""
-        self.getPosition()
+    """
+     * Sets the player icon in the begining of the maze
+    """
+    def setPlayerOriginPoint(self, row):
+        yDisplacement = row * consts.BLOCK_SIZE + consts.MAZE_MARGIN
+        self.rect = pygame.Rect(consts.MAZE_MARGIN, yDisplacement, consts.BLOCK_SIZE,
+                        consts.BLOCK_SIZE)
 
     """
-    * 
-    *
-    * @param {String} 
+     * Sets the player logic position to the begining of the maze
     """
-    def getPosition(self):
-        x = y = 0
-        for row in maze:
-            y = 0
-            for col in row:
-                if (col == 'i'):
-                    self.row = x
-                    self.column = y
-                y+=1
-            x+=1
-
+    def setOriginPoint(self, originPoint):
+        self.row = originPoint[0] 
+        self.column = originPoint[1] 
     """
     * 
     *
     * @param {String} 
     """  
-    def move(self, dx, dy, xDisplacement, yDisplacement, controller):
-        if (self.validarMovimiento(dx, dy, xDisplacement, yDisplacement, controller)):
-            if (dx > 0): 
-                self.previous="RIGHT"
-                self.column+=1
-            if (dx < 0): 
-                self.previous="LEFT"
-                self.column-=1
-            if (dy > 0): 
-                self.previous="DOWN"
-                self.row+=1
-            if (dy < 0):
-                self.previous="UP"
-                self.row-=1
-            self.movements+=1
-            self.rect = pygame.Rect(self.rect.x+dx,self.rect.y+dy, 40,40)
-        else:
-            print("Cannot move")
+    def move(self, dx, dy):
+        if (dx > 0): 
+            self.previous="RIGHT"
+            self.column+=1
+        if (dx < 0): 
+            self.previous="LEFT"
+            self.column-=1
+        if (dy > 0): 
+            self.previous="DOWN"
+            self.row+=1
+        if (dy < 0):
+            self.previous="UP"
+            self.row-=1
+        self.movements+=1
+        self.rect = pygame.Rect(self.rect.x+dx,self.rect.y+dy, 40,40)
 
-    """
-    * 
-    *
-    * @param {String} 
-    """            
-    def validarMovimiento(self, dx, dy, xDisplacement, yDisplacement, controller):
-        posActual = maze[self.row][self.column]
-        valid = controller.checkMove(self.row, self.column, self.row + xDisplacement,
-                        self.column + yDisplacement, posActual)
-        return valid
  
     """
     * 
@@ -93,13 +77,7 @@ class Player:
             column = element[1]*40+15
             array+= [[column,row]]
         return array
-
     """
-    * 
-    *
-    * @param {String} 
-    """
-"""
     * 
     *
     * @param {String} 
@@ -184,19 +162,6 @@ class Boton:
 path = ""              
 walls = []
 ways = []
-maze = [['x','x','x','x','x','x','x','x','x','x','x'],
-        ['x','ar','x','x','ad','ad','ad','inter','ad','inter','x'],
-        ['i','inter','ad','ad','inter','x','x','ab','x','ab','x'],
-        ['x','ab','x','x','x','inter','at','inter','x','ab','x'],
-        ['x','ab','x','x','x','ab','x','ab','x','x','x'],
-        ['x','ab','x','x','inter','inter','x','ab','x','inter','f'],
-        ['x','ab','x','x','ab','x','x','inter','inter','inter','x'],
-        ['x','ab','x','x','ab','x','x','x','ar','x','x'],
-        ['x','ab','x','at','inter','inter','ad','ad','inter','at','x'],
-        ['x','ab','x','ar','x','ab','x','x','ab','ar','x'],
-        ['x','inter','ad','inter','x','inter','ad','x','ab','inter','x'],
-        ['x','x','x','x','x','x','x','x','x','x','x']]
-
 
 """
     * 
@@ -213,7 +178,6 @@ class App:
         pygame.init()
         flags = RESIZABLE
         App.screen = pygame.display.set_mode((650, 500), flags)
-        App.running = True
         self.player = Player()
         self.end_rect=""
         self.button_reboot = Rect(520,50,90,30)
@@ -222,10 +186,8 @@ class App:
         self.button_seeSolition = Rect(490,200,140,30)
         self.suggetion_list= []
         self.seeSolition_list= []
-        self.draw()
         self.plController = ''
-        #maze = self.controllerProlog.getMaze()
-        
+       
     def mainMenu(self):
         while True:
             screenWidth, screenHeight = pygame.display.get_surface().get_size()
@@ -269,15 +231,27 @@ class App:
                             inputText = InputText()
                             inputText.run()
                             self.plController = controllerProlog.PrologController(inputText.text)
+                            originPoint = self.plController.getOriginPoint()
+                            self.player.setOriginPoint(originPoint)
+                            self.player.setPlayerOriginPoint(originPoint[0])
+                            self.draw(self.plController.maze)
                             self.run()
+
             pygame.display.flip()
 
+    def checkMove(self, rowDisplacement, columnDisplacement):
+        actualRow = self.player.row
+        actualColumn = self.player.column
+        actualPos = self.plController.maze[actualRow][actualColumn]
+        isValid = self.plController.checkMove(actualRow, actualColumn,
+                        actualRow + rowDisplacement, actualColumn + columnDisplacement, actualPos)
+        return isValid
     """
     * 
     *
     * @param {String} 
     """
-    def draw(self):
+    def draw(self, maze):
         x = y = 15
         for row in maze:
             for col in row:
@@ -297,10 +271,10 @@ class App:
     * @param {String} 
     """
     def reboot(self):
-        self.player.rect = pygame.Rect(15, 95, 40,40)
         self.player.type = "Abandono"
-        self.player.row = 2
-        self.player.column = 0
+        originPoint = self.plController.getOriginPoint()
+        self.player.setOriginPoint(originPoint)
+        self.player.setPlayerOriginPoint(originPoint[0])
 
     """
     * 
@@ -375,13 +349,17 @@ class App:
                 
                 elif event.type == pygame.KEYDOWN:
                     if (event.key == K_RIGHT):
-                        self.player.move(40, 0, 0, 1, self.plController)
+                        if self.checkMove(0, 1):
+                            self.player.move(40, 0)
                     elif (event.key == K_LEFT):
-                        self.player.move(-40, 0, 0, -1, self.plController)
+                        if self.checkMove(0, -1):
+                            self.player.move(-40, 0)
                     elif (event.key == K_UP):
-                        self.player.move(0, -40, -1, 0, self.plController)
+                        if self.checkMove(-1, 0):
+                            self.player.move(0, -40)
                     elif (event.key == K_DOWN):
-                        self.player.move(0, 40, 1, 0, self.plController)
+                        if self.checkMove(1, 0):
+                            self.player.move(0, 40)
                     if event.key == K_ESCAPE:
                         running = False
                                     

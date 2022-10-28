@@ -74,6 +74,10 @@ destinePoint([_|Tail], Row, Column):-
     destinePoint(Tail, RowDown, Column),
     Row is RowDown + 1.
 
+% Returs the origin point.
+getOriginPoint(OriginRow, OriginColumn):-
+    maze(Maze),
+    originPoint(Maze, OriginRow, OriginColumn).
 
 % Obtains the value of the (i,j) position in the game matrix.
 getVertexValue(RowIndex, ColumnIndex, Value):-

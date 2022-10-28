@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 from inputText import InputText 
 import time
+import constants as consts
 #import controllerProlog
 
 """
@@ -148,7 +149,7 @@ class Way(object):
     
     def draw(self,pos,wayType):
         if (wayType == 'ad'):
-            self.img = pygame.image.load('imagen/flecha-derecha.png')
+            self.img = pygame.image.load('resource/flecha-derecha.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -157,7 +158,7 @@ class Way(object):
 
         elif (wayType == 'ar'):
 
-            self.img = pygame.image.load('imagen/flecha-arriba.png')
+            self.img = pygame.image.load('resource/flecha-arriba.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -165,7 +166,7 @@ class Way(object):
             self.rect.height = 40
 
         elif (wayType == 'ab'):
-            self.img = pygame.image.load('imagen/flecha-abajo.png')
+            self.img = pygame.image.load('resource/flecha-abajo.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -173,7 +174,7 @@ class Way(object):
             self.rect.height = 40
 
         elif (wayType == 'inter'):
-            self.img = pygame.image.load('imagen/cuatro-flechas.png')
+            self.img = pygame.image.load('resource/cuatro-flechas.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -181,7 +182,7 @@ class Way(object):
             self.rect.height = 40
         
         elif (wayType == 'at'):
-            self.img = pygame.image.load('imagen/flechas-circulares.png')
+            self.img = pygame.image.load('resource/flechas-circulares.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -189,7 +190,7 @@ class Way(object):
             self.rect.height = 40
 
         else:
-            self.img = pygame.image.load('imagen/flecha-de-juego.png')
+            self.img = pygame.image.load('resource/flecha-de-juego.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -252,6 +253,52 @@ class App:
         self.path = Path
         #self.controllerProlog = ControllerProlog(self.path)
         #maze = self.controllerProlog.getMaze()
+        
+    def mainMenu(self):
+        while True:
+            screenWidth, screenHeight = pygame.display.get_surface().get_size()
+            App.screen.fill((174, 219, 52))
+
+            font = pygame.font.SysFont(None, 40)
+            textobj = font.render("Directed Maze", 1, (0,0,0))
+            textrect = textobj.get_rect()
+            textrect.center = (screenWidth // 2, screenHeight // 2 - 150)
+            self.screen.blit(textobj, textrect)
+            #Buttons
+            buttonPlay = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 - 50 , 200, 50)
+            buttonExit = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 + 25, 200, 50)
+            # Draw buttons
+            pygame.draw.rect(App.screen, (252, 118, 52), buttonPlay)
+            pygame.draw.rect(App.screen, (252, 118, 52), buttonExit)
+
+
+            # Texts
+            textPlay = font.render("New Game", 0, (27, 72, 107))
+            textPlayCenter = textPlay.get_rect()
+            textPlayCenter.center = (buttonPlay.centerx, buttonPlay.centery)
+
+            textExit = font.render("Exit", 1, (27, 72, 107))
+            textExitCenter = textExit.get_rect()
+            textExitCenter.center = (buttonExit.centerx, buttonExit.centery)
+
+            self.screen.blit(textPlay, textPlayCenter)
+            self.screen.blit(textExit, textExitCenter)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if buttonExit.collidepoint(mouse.get_pos()):
+                            pygame.quit()
+                            sys.exit()
+                        if buttonPlay.collidepoint(mouse.get_pos()):
+                            inputText = InputText()
+                            inputText.run()
+                            self.run()
+            pygame.display.flip()
+
     """
     * 
     *
@@ -346,9 +393,10 @@ class App:
     def run(self):
         flag_Suggetion = False
         flag_seeSolition = False
+        running = True
 
         myFort = font.SysFont("Calibri",25)
-        while App.running:
+        while running:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     App.running = False
@@ -362,6 +410,8 @@ class App:
                         self.player.move(0, -40)
                     elif (event.key == K_DOWN):
                         self.player.move(0, 40)
+                    if event.key == K_ESCAPE:
+                        running = False
                                     
                 elif (event.type == MOUSEBUTTONDOWN and event.button == 1):
                     if (self.button_reboot.collidepoint(mouse.get_pos())):
@@ -422,9 +472,9 @@ class App:
                 for element in self.suggetion_list:
                     pygame.draw.rect(App.screen , (0, 128, 0), element,4)
                 pygame.display.update()
-                time.sleep(3)
+                time.sleep(2)
                 flag_Suggetion = False
-        pygame.quit()
+        pygame.display.update()
 
 """
     * 
@@ -432,6 +482,5 @@ class App:
     * @param {String} 
     """
 if __name__ == '__main__':
-    inputText = InputText()
-    inputText.run()
-    App(inputText.text).run()
+    App("data/maze000.txt").mainMenu()
+

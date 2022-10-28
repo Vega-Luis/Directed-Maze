@@ -51,8 +51,8 @@ class Player:
     *
     * @param {String} 
     """  
-    def move(self, dx, dy):
-        if (self.validarMovimiento(dx, dy)):
+    def move(self, dx, dy, xDisplacement, yDisplacement, controller):
+        if (self.validarMovimiento(dx, dy, xDisplacement, yDisplacement, controller)):
             if (dx > 0): 
                 self.previous="RIGHT"
                 self.column+=1
@@ -75,38 +75,11 @@ class Player:
     *
     * @param {String} 
     """            
-    def validarMovimiento(self, dx, dy):
-        posActual = maze[self.row][self.column] 
-        if(posActual!='i'):
-            if (posActual == 'at'):
-                print(self.previous)
-                if (dx > 0 and self.previous=="LEFT"): 
-                    return True
-                if (dx < 0 and self.previous=="RIGHT"): 
-                    return True
-                if (dy > 0 and self.previous=="UP"): 
-                    return True
-                if (dy < 0 and self.previous=="DOWN"):
-                    return True
-                return False
-            else:
-                posActual = maze[self.row][self.column] 
-                if (dx > 0): 
-                    posNext = maze[self.row][self.column+1] 
-                    return ((posActual == 'ad' or posActual == 'inter') and posNext !='x')
-                if (dx < 0): 
-                    posNext = maze[self.row][self.column-1]
-                    return (posActual == 'inter' and posNext !='x')
-                if (dy > 0): 
-                    posNext = maze[self.row+1][self.column]
-                    return ((posActual == 'ab' or posActual == 'inter') and posNext !='x')
-                if (dy < 0):
-                    posNext = maze[self.row-1][self.column]
-                    return ((posActual == 'ar' or posActual == 'inter') and posNext!='x')
-        else:
-            if (dx>0):
-                return True
-            return False
+    def validarMovimiento(self, dx, dy, xDisplacement, yDisplacement, controller):
+        posActual = maze[self.row][self.column]
+        valid = controller.checkMove(self.row, self.column, self.row + xDisplacement,
+                        self.column + yDisplacement, posActual)
+        return valid
  
     """
     * 
@@ -318,7 +291,6 @@ class App:
             x += 40
             y = 15
 
-
     """
     * 
     *
@@ -329,20 +301,18 @@ class App:
         self.player.type = "Abandono"
         self.player.row = 2
         self.player.column = 0
-    
+
     """
     * 
     *
     * @param {String} 
     """
     def verify(self):
-        """flag = self.controllerProlog.check(self.player.row,self.player.column)
+        flag = self.plController.check(self.player.row,self.player.column)
         if (flag):
-            pass
+            print("Yes") 
         else:
-            pass
-        """
-        pass
+            print("No")
 
     """
     * 
@@ -401,23 +371,24 @@ class App:
         while running:
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    App.running = False
+                    running = False
                 
                 elif event.type == pygame.KEYDOWN:
                     if (event.key == K_RIGHT):
-                        self.player.move(40, 0)
+                        self.player.move(40, 0, 0, 1, self.plController)
                     elif (event.key == K_LEFT):
-                        self.player.move(-40, 0)
+                        self.player.move(-40, 0, 0, -1, self.plController)
                     elif (event.key == K_UP):
-                        self.player.move(0, -40)
+                        self.player.move(0, -40, -1, 0, self.plController)
                     elif (event.key == K_DOWN):
-                        self.player.move(0, 40)
+                        self.player.move(0, 40, 1, 0, self.plController)
                     if event.key == K_ESCAPE:
                         running = False
                                     
                 elif (event.type == MOUSEBUTTONDOWN and event.button == 1):
                     if (self.button_reboot.collidepoint(mouse.get_pos())):
-                        self.player.reboot()
+                        self.reboot()
+                        flag_seeSolition = False
                     elif (self.button_suggetion.collidepoint(mouse.get_pos())):
                         self.suggetion()
                         flag_Suggetion = True
@@ -427,8 +398,7 @@ class App:
                         flag_seeSolition = True
 
                     elif (self.button_verify.collidepoint(mouse.get_pos())):
-                        print("Tres")
-
+                        self.verify()
             if self.player.rect.colliderect(self.end_rect):
                     self.player.type = "Exitosa" 
                     self.statistics()

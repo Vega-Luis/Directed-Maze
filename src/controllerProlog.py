@@ -70,7 +70,16 @@ class PrologController:
             flag = True
         q.closeQuery()
         return flag
-    
+
+    def checkMove(self, ActualRow, ActualColumn, DestineRow, DestineColumn, VertexType):
+        edge = Functor('edge', 5)
+        q = Query(edge(ActualRow, ActualColumn, DestineRow, DestineColumn, VertexType))
+        validMove = False
+        while q.nextSolution():
+            validMove = True
+        q.closeQuery()
+        return validMove
+
     """
      * This function gives position suggestions to find a route solution
      * @param {Integer} ActualRow: current position row 
@@ -97,6 +106,6 @@ class PrologController:
         q = Query(findSolution(Maze))
         matrix = []
         while q.nextSolution():
-            matrix = Maze.value
+            matrix += Maze.value
         q.closeQuery()
         return matrix

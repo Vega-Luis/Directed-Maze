@@ -275,6 +275,7 @@ class App:
         originPoint = self.plController.getOriginPoint()
         self.player.setOriginPoint(originPoint)
         self.player.setPlayerOriginPoint(originPoint[0])
+        self.player.suggestions = 10
 
     """
     * 

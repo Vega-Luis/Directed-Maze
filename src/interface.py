@@ -34,9 +34,8 @@ class Player:
      * Sets the player icon in the begining of the maze
     """
     def setPlayerOriginPoint(self, row):
-        yDisplacement = row * consts.BLOCK_SIZE + consts.MAZE_MARGIN
-        self.rect = pygame.Rect(consts.MAZE_MARGIN, yDisplacement, consts.BLOCK_SIZE,
-                        consts.BLOCK_SIZE)
+        yDisplacement = row * 40 + 15
+        self.rect = pygame.Rect(15, yDisplacement, 40, 40)
 
     """
      * Sets the player logic position to the begining of the maze
@@ -298,10 +297,9 @@ class App:
     def verify(self):
         flag = self.plController.check(self.player.row,self.player.column)
         if (flag):
-            print("Yes") 
+            self.goodFeedback() 
         else:
-            print("No")
-
+            self.badFeedback()
     """
     * 
     *
@@ -370,15 +368,23 @@ class App:
                     if (event.key == K_RIGHT):
                         if self.checkMove(0, 1):
                             self.player.move(40, 0)
+                        else:
+                            self.badFeedback()
                     elif (event.key == K_LEFT):
                         if self.checkMove(0, -1):
                             self.player.move(-40, 0)
+                        else:
+                            self.badFeedback()
                     elif (event.key == K_UP):
                         if self.checkMove(-1, 0):
                             self.player.move(0, -40)
+                        else:
+                            self.badFeedback()
                     elif (event.key == K_DOWN):
                         if self.checkMove(1, 0):
                             self.player.move(0, 40)
+                        else:
+                            self.badFeedback()
                     if event.key == K_ESCAPE:
                         running = False
                                     
@@ -446,6 +452,16 @@ class App:
                 time.sleep(1)
                 flag_Suggetion = False
         pygame.display.update()
+    
+    def badFeedback(self):
+        pygame.draw.rect(self.screen, (255, 0, 0), self.player.rect)
+        pygame.display.update()
+        time.sleep(0.12)
+
+    def goodFeedback(self):
+        pygame.draw.rect(self.screen, (0, 255, 0), self.player.rect)
+        pygame.display.update()
+        time.sleep(0.12)
 
 """
     * 

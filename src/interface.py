@@ -186,6 +186,9 @@ class App:
         self.seeSolition_list= []
         self.plController = ''
         self.statistics = []
+        self.clock = pygame.time.Clock()
+        self.time = ""
+        self.startTime = 0
        
     def mainMenu(self):
         App.screen = pygame.display.set_mode((650, 500))
@@ -243,6 +246,7 @@ class App:
                             originPoint = self.plController.getOriginPoint()
                             self.player.setOriginPoint(originPoint)
                             self.player.setPlayerOriginPoint(originPoint[0])
+                            self.player.movements = 0
                             self.draw(self.plController.maze)
                             self.run()
 
@@ -288,6 +292,7 @@ class App:
         self.player.setPlayerOriginPoint(originPoint[0])
         self.player.suggestions = 10
         self.player.movements = 0
+        self.startTime = pygame.time.get_ticks()
     """
     * 
     *
@@ -332,7 +337,7 @@ class App:
 
     def addStat(self):
         newStat = Stat(self.player.name, self.player.movements,
-                        10 - self.player.suggestions, self.player.type)
+                        10 - self.player.suggestions, self.player.type, self.time)
         self.statistics += [newStat]
 
     """
@@ -345,7 +350,21 @@ class App:
         for record in self.statistics:
            str += record.toString()
         StatsWindow(str).run()
+
+    def chronometer(self):
+        finishTime = pygame.time.get_ticks()
+        elapsed = finishTime - self.startTime
+        ms = elapsed % 1000
+        s = int(elapsed/1000 % 60)
+        m = int(elapsed/60000 % 24)
+        self.time = str(m) + ":" + str(s) + ":" + str(ms)
     
+    def drawChronometer(self):
+        font = pygame.font.SysFont(None, 30)
+        textobj = font.render(self.time, 1, (255, 255, 255))
+        textrect = textobj.get_rect()
+        textrect.center = (550, 300)
+        self.screen.blit(textobj, textrect)
 
     """
     * 
@@ -357,9 +376,10 @@ class App:
         flag_Suggetion = False
         flag_seeSolition = False
         running = True
-
         myFort = font.SysFont("Calibri",25)
+        self.startTime = pygame.time.get_ticks()
         while running:
+            self.chronometer()
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
@@ -443,13 +463,14 @@ class App:
             self.screen.blit(texto4,(self.button_reboot.x+(self.button_reboot.width-texto4.get_width())/2,
                         self.button_reboot.y+(self.button_reboot.height-texto4.get_height())/2))
             
+            self.drawChronometer()
             pygame.display.flip()
-
+            self.clock.tick(30)
             if (flag_Suggetion):
                 for element in self.suggetion_list:
                     pygame.draw.rect(App.screen , (0, 128, 0), element,4)
                 pygame.display.update()
-                time.sleep(1)
+                time.sleep(0.25)
                 flag_Suggetion = False
         pygame.display.update()
     
@@ -459,7 +480,7 @@ class App:
         time.sleep(0.12)
 
     def goodFeedback(self):
-        pygame.draw.rect(self.screen, (0, 255, 0), self.player.rect)
+        pygame.draw.rect(self.screen, (0, 170, 228), self.player.rect)
         pygame.display.update()
         time.sleep(0.12)
 

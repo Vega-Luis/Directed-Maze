@@ -7,7 +7,8 @@ from inputText import InputText
 import time
 import constants as consts
 import controllerProlog
-
+from stat_record import Stat
+from stats_window import StatsWindow
 """
 * Class constructor
 * Set up a maze game by requesting the path of the maze file
@@ -187,6 +188,7 @@ class App:
         self.suggetion_list= []
         self.seeSolition_list= []
         self.plController = ''
+        self.statistics = []
        
     def mainMenu(self):
         while True:
@@ -200,9 +202,11 @@ class App:
             self.screen.blit(textobj, textrect)
             #Buttons
             buttonPlay = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 - 50 , 200, 50)
-            buttonExit = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 + 25, 200, 50)
+            buttonStats = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 + 25, 200, 50)
+            buttonExit = pygame.Rect(screenWidth // 2 - 100, screenHeight // 2 + 100, 200, 50)
             # Draw buttons
             pygame.draw.rect(App.screen, (252, 118, 52), buttonPlay)
+            pygame.draw.rect(App.screen, (252, 118, 52), buttonStats)
             pygame.draw.rect(App.screen, (252, 118, 52), buttonExit)
 
 
@@ -211,11 +215,16 @@ class App:
             textPlayCenter = textPlay.get_rect()
             textPlayCenter.center = (buttonPlay.centerx, buttonPlay.centery)
 
+            textStats = font.render("Stats", 1, (27, 72, 107))
+            textStatsCenter = textStats.get_rect()
+            textStatsCenter.center = (buttonStats.centerx, buttonStats.centery)
+
             textExit = font.render("Exit", 1, (27, 72, 107))
             textExitCenter = textExit.get_rect()
             textExitCenter.center = (buttonExit.centerx, buttonExit.centery)
 
             self.screen.blit(textPlay, textPlayCenter)
+            self.screen.blit(textStats, textStatsCenter)
             self.screen.blit(textExit, textExitCenter)
 
             for event in pygame.event.get():
@@ -224,6 +233,8 @@ class App:
                     sys.exit()
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
+                        if buttonStats.collidepoint(mouse.get_pos()):
+                            self.printStatistics()
                         if buttonExit.collidepoint(mouse.get_pos()):
                             pygame.quit()
                             sys.exit()
@@ -271,12 +282,14 @@ class App:
     * @param {String} 
     """
     def reboot(self):
-        self.player.type = "Abandono"
+        self.player.type = "Quit"
+        self.addStat()
+        self.player.type = ""
         originPoint = self.plController.getOriginPoint()
         self.player.setOriginPoint(originPoint)
         self.player.setPlayerOriginPoint(originPoint[0])
         self.player.suggestions = 10
-
+        self.player.movements = 0
     """
     * 
     *
@@ -318,18 +331,23 @@ class App:
         for element in array:
             rect = pygame.Rect(element[0],element[1],40,40)
             self.seeSolition_list.append(rect)
-        self.player.type="Autosolución" 
+        self.player.type="Auto solution"
+
+    def addStat(self):
+        newStat = Stat(self.player.name, self.player.movements,
+                        10 - self.player.suggestions, self.player.type)
+        self.statistics += [newStat]
 
     """
     * 
     *
     * @param {String} 
     """
-    def statistics(self):
-        print("Nickname: ",self.player.name)
-        print("Movements: ",self.player.movements)
-        print("Suggestions: ",self.player.suggestions)
-        print("Solution type: ",self.player.type)
+    def printStatistics(self):
+        str = ""
+        for record in self.statistics:
+           str += record.toString()
+        StatsWindow(str).run()
     
 
     """
@@ -379,8 +397,10 @@ class App:
                     elif (self.button_verify.collidepoint(mouse.get_pos())):
                         self.verify()
             if self.player.rect.colliderect(self.end_rect):
-                    self.player.type = "Exitosa" 
-                    self.statistics()
+                    if flag_seeSolition == False:
+                        self.player.type = "Exitosa"
+                    self.addStat()
+                    running = False
 
             App.screen.fill((0, 0, 50))
             
@@ -402,8 +422,8 @@ class App:
 
             texto1 = myFort.render("Verify",True,(255,255,255))
             texto2 = myFort.render("Suggetion",True,(255,255,255))
-            texto3 = myFort.render("See Solition",True,(255,255,255))
-            texto4 = myFort.render("Reniciar",True,(255,255,255))
+            texto3 = myFort.render("See Solution",True,(255,255,255))
+            texto4 = myFort.render("Restart",True,(255,255,255))
 
             self.screen.blit(texto1,(self.button_verify.x+(self.button_verify.width-texto1.get_width())/2,
                         self.button_verify.y+(self.button_verify.height-texto1.get_height())/2))

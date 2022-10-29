@@ -19,7 +19,7 @@ class InputText:
         pygame.init()
         pygame.scrap.init()
         flags = RESIZABLE
-        InputText.screen = pygame.display.set_mode((600, 180), flags)
+        InputText.screen = pygame.display.set_mode((600, 180))
         InputText.running = True
 
         self.input_box = pygame.Rect(50, 60, 400, 40)

@@ -13,7 +13,7 @@ class StatsWindow:
         self.BACKGROUND_COLOR = (255, 255, 255)
         self.FONT_TYPE = None
         self.isRunning = True
-        StatsWindow.screen = pygame.display.set_mode((650, 500), RESIZABLE)
+        StatsWindow.screen = pygame.display.set_mode((650, 500))
     
     """
      * Runs the statistics window

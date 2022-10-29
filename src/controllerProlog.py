@@ -1,7 +1,7 @@
 from random import gammavariate
 from sys import flags
 from pyswip import *
-import constants as consts
+from constants import *
 
 class PrologController:
     """
@@ -10,7 +10,7 @@ class PrologController:
      * @param {String} Path: The path of the maze file
     """
     prolog = Prolog()
-    prolog.consult(consts.GAME_RULES_PAHT)
+    prolog.consult(GAME_RULES_PAHT)
 
     def __init__(self,Path):
         self.maze=[]

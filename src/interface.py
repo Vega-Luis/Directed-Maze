@@ -1,11 +1,9 @@
-from ssl import OPENSSL_VERSION_INFO
 import sys
 from pygame import *
 import pygame
 from pygame.locals import *
 from inputText import InputText 
 import time
-import constants as consts
 import controllerProlog
 from stat_record import Stat
 from stats_window import StatsWindow
@@ -177,7 +175,7 @@ class App:
     def __init__(self):
         pygame.init()
         flags = RESIZABLE
-        App.screen = pygame.display.set_mode((650, 500), flags)
+        App.screen = pygame.display.set_mode((650, 500))
         self.player = Player()
         self.end_rect=""
         self.button_reboot = Rect(520,50,90,30)
@@ -190,6 +188,7 @@ class App:
         self.statistics = []
        
     def mainMenu(self):
+        App.screen = pygame.display.set_mode((650, 500))
         while True:
             screenWidth, screenHeight = pygame.display.get_surface().get_size()
             App.screen.fill((174, 219, 52))
@@ -354,6 +353,7 @@ class App:
     * @param {String} 
     """
     def run(self):
+        screen = pygame.display.set_mode((650, 500))
         flag_Suggetion = False
         flag_seeSolition = False
         running = True

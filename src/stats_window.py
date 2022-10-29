@@ -37,5 +37,5 @@ class StatsWindow:
                 if event.type == QUIT:
                     self.isRunning = False
                 if event.type == pygame.MOUSEWHEEL:
-                    self.yDisplacement = self.yDisplacement + (20 * event.y)
+                    self.yDisplacement = self.yDisplacement + (self.FONT_SIZE* event.y)
             pygame.display.flip()

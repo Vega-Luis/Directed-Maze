@@ -3,22 +3,18 @@ from pygame import *
 import pygame
 from pygame.locals import *
 from inputText import InputText 
+from pyswip import *
+from constants import *
 import time
 import controllerProlog
 from stat_record import Stat
 from stats_window import StatsWindow
+
 """
-* Class constructor
-* Set up a maze game by requesting the path of the maze file
-* @param {String} Path: The path of the maze file
+* Class Player
+* This class is used to simulate the maze player
 """
 class Player:
-    """
-    * 
-    *
-    * @param {String} 
-    """
-
     def __init__(self):
         self.name = "nickNmae"
         self.movements = 0
@@ -28,23 +24,27 @@ class Player:
         self.row = 0
         self.column = 0 
         self.previous=""
+
     """
-     * Sets the player icon in the begining of the maze
-    """
+     * This function sets the player icon in the begining of the maze
+     * @param {Integer} Row: current position row 
+    """  
     def setPlayerOriginPoint(self, row):
         yDisplacement = row * 40 + 15
         self.rect = pygame.Rect(15, yDisplacement, 40, 40)
 
     """
-     * Sets the player logic position to the begining of the maze
+     * This function the player logic position to the begining of the maze
+     * @param {Integer} Row: current position row 
     """
     def setOriginPoint(self, originPoint):
         self.row = originPoint[0] 
         self.column = originPoint[1] 
+
     """
-    * 
-    *
-    * @param {String} 
+    * This function moves the position of the player
+    * @param {Integer} dx: current position row 
+    * @param {Integer} dy: current position column
     """  
     def move(self, dx, dy):
         if (dx > 0): 
@@ -64,10 +64,10 @@ class Player:
 
  
     """
-    * 
-    *
-    * @param {String} 
-    """
+    * This function gets the position of the player in the maze and returns an array with the value of the straight position
+    * @param {Array} list: current position of the player
+    * @return {Array}: returns an array with the value of the straight position
+    """  
     def getValue(self,list):
         array = []
         for element in list:
@@ -75,20 +75,19 @@ class Player:
             column = element[1]*40+15
             array+= [[column,row]]
         return array
-    """
-    * 
-    *
-    * @param {String} 
-    """
+
+        
+"""
+* This class simulates a maze wall.
+"""
 class Wall(object):
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 40, 40)
+
 """
-    * 
-    *
-    * @param {String} 
-    """
+* This class simulates the path of the maze.
+"""
 class Way(object):
     def __init__(self, pos,wayType):
         self.img = pygame.image.load('resource/vacio.png')
@@ -96,6 +95,11 @@ class Way(object):
         ways.append(self)
         self.draw(pos,wayType)
     
+    """
+    * This function gets the position of the player in the maze and returns an array with the value of the straight position
+    * @param {Array} pos: current position of the way
+    * @param {String} wayType: the type of way to draw
+    """ 
     def draw(self,pos,wayType):
         if (wayType == 'ad'):
             self.img = pygame.image.load('resource/flecha-derecha.png')
@@ -131,7 +135,7 @@ class Way(object):
             self.rect.height = 40
         
         elif (wayType == 'at'):
-            self.img = pygame.image.load('resource/flechas-circulares.png')
+            self.img = pygame.image.load('resource/flecha-izquierda.png')
             self.img.convert()
             self.rect = self.img.get_rect()
             self.rect.center = pos[0]+20,pos[1]+20
@@ -147,31 +151,23 @@ class Way(object):
             self.rect.height = 40
 
 """
-    * 
-    *
-    * @param {String} 
-    """
+*This class simulates a button
+"""
 class Boton:
     def __init__(self,screen):
         self.screen = screen
         self.rect = self.screen.get_rect()
         self.width = self.height = 500, 500
 
-path = ""              
-walls = []
-ways = []
+path = ""   # the path of the maze           
+walls = [] # maze wall list
+ways = []  # maze way list
+
 
 """
-    * 
-    *
-    * @param {String} 
-    """
+* This class simulates a maze with condition to moves
+"""
 class App:
-    """
-    * 
-    *
-    * @param {String} 
-    """
     def __init__(self):
         pygame.init()
         flags = RESIZABLE
@@ -190,6 +186,9 @@ class App:
         self.time = ""
         self.startTime = 0
        
+    """
+    * Menu of the maze game
+    """
     def mainMenu(self):
         App.screen = pygame.display.set_mode((650, 500))
         while True:
@@ -252,6 +251,12 @@ class App:
 
             pygame.display.flip()
 
+    """
+    * This function check the moze for the palyer 
+    * @param {Array} rowDisplacement: current row position of the player
+    * @param {Array} columnDisplacement: current column position of the player
+    * @return True si es un movimento valido de lo contraio
+    """  
     def checkMove(self, rowDisplacement, columnDisplacement):
         actualRow = self.player.row
         actualColumn = self.player.column
@@ -259,11 +264,11 @@ class App:
         isValid = self.plController.checkMove(actualRow, actualColumn,
                         actualRow + rowDisplacement, actualColumn + columnDisplacement, actualPos)
         return isValid
+  
     """
-    * 
-    *
-    * @param {String} 
-    """
+    * This function draw the maze
+    * @param {Array} maze: maze game
+    """  
     def draw(self, maze):
         x = y = 15
         for row in maze:
@@ -279,9 +284,7 @@ class App:
             y = 15
 
     """
-    * 
-    *
-    * @param {String} 
+    * This function puts de current position of the playe in a original row and
     """
     def reboot(self):
         self.player.type = "Quit"
@@ -293,10 +296,9 @@ class App:
         self.player.suggestions = 10
         self.player.movements = 0
         self.startTime = pygame.time.get_ticks()
+    
     """
-    * 
-    *
-    * @param {String} 
+    * This verify a the position of de player
     """
     def verify(self):
         flag = self.plController.check(self.player.row,self.player.column)
@@ -304,10 +306,9 @@ class App:
             self.goodFeedback() 
         else:
             self.badFeedback()
+    
     """
-    * 
-    *
-    * @param {String} 
+    *This function gives clues to the player in the maze
     """
     def suggetion(self):
         self.suggetion_list = []
@@ -318,14 +319,9 @@ class App:
                 rect = pygame.Rect(element[0],element[1],40,40)
                 self.suggetion_list.append(rect)
             self.player.suggestions -= 1
-        else:
-            pass
-            #sonido o ventana
-        
+            
     """
-    * 
-    *
-    * @param {String} 
+    * This function give the solution of the maze
     """
     def seeSolution(self):
         seeSolutions_list = self.plController.seeSolution()
@@ -335,15 +331,14 @@ class App:
             self.seeSolition_list.append(rect)
         self.player.type="Auto solution"
 
+
     def addStat(self):
         newStat = Stat(self.player.name, self.player.movements,
                         10 - self.player.suggestions, self.player.type, self.time)
         self.statistics += [newStat]
 
     """
-    * 
-    *
-    * @param {String} 
+    *This function shows the statistics of the players
     """
     def printStatistics(self):
         str = ""
@@ -351,6 +346,9 @@ class App:
            str += record.toString()
         StatsWindow(str).run()
 
+    """
+    *This function create the clock of the maze
+    """
     def chronometer(self):
         finishTime = pygame.time.get_ticks()
         elapsed = finishTime - self.startTime
@@ -359,6 +357,9 @@ class App:
         m = int(elapsed/60000 % 24)
         self.time = str(m) + ":" + str(s) + ":" + str(ms)
     
+    """
+    * This function draw the clock of the maze
+    """
     def drawChronometer(self):
         font = pygame.font.SysFont(None, 30)
         textobj = font.render(self.time, 1, (255, 255, 255))
@@ -367,9 +368,7 @@ class App:
         self.screen.blit(textobj, textrect)
 
     """
-    * 
-    *
-    * @param {String} 
+    * This function runs the program
     """
     def run(self):
         screen = pygame.display.set_mode((650, 500))
@@ -438,7 +437,7 @@ class App:
                 for way in ways:
                     App.screen.blit(way.img, way.rect)
                 for element in self.seeSolition_list:
-                    pygame.draw.rect(App.screen , (0, 128, 0), element)
+                    pygame.draw.rect(App.screen , (0, 128, 0), element,4)
             else:
                 for way in ways:
                     App.screen.blit(way.img, way.rect)
@@ -485,10 +484,8 @@ class App:
         time.sleep(0.12)
 
 """
-    * 
-    *
-    * @param {String} 
-    """
+*Game initialization
+"""
 if __name__ == '__main__':
     App().mainMenu()
 

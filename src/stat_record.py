@@ -1,3 +1,6 @@
+"""
+*This class is used to display player statistics.
+"""
 class Stat:
     def __init__(self, nickname, movements, suggestions, solution, time):
         self.nickname = nickname

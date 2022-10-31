@@ -2,6 +2,10 @@ from pygame import *
 import pygame
 from pygame.locals import *
 
+"""
+* Class InputText
+* This class is used to get the address of a file
+"""
 class InputText:
 
     def __init__(self):
@@ -13,9 +17,12 @@ class InputText:
         self.color = ""        
         self.active = ""
         self.text = ''
-        
+    """
+    * Function: Run 
+    * Use to initialize the class and get de file path
+    * @return {String}: return the file path
+    """    
     def run(self):
-
         pygame.init()
         pygame.scrap.init()
         flags = RESIZABLE
@@ -52,9 +59,6 @@ class InputText:
                                 return self.text
                         elif event.key == pygame.K_v and event.mod & pygame.KMOD_CTRL:
                             self.text = pygame.scrap.get("text/plain;charset=utf-8").decode()
-                            #s1 = text[:len(text)//2]
-                            #s2 = text[len(text)//2:]
-                            #self.text+=  s1 + "\n" +s2
 
                         elif (event.key == pygame.K_BACKSPACE):
                             self.text = self.text[:-1]
